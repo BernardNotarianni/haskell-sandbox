@@ -2,7 +2,13 @@ module Sandbox.BoxSpec (spec) where
 
 import Test.Hspec
 import Control.Exception
+import Control.Monad.Reader
 
+
+data MyContext = MyContext
+                 { foo :: String
+                 , bar :: Int
+                 } deriving (Show)
 
 spec :: Spec
 spec = do
@@ -41,3 +47,20 @@ spec = do
          stringInIO :: String -> IO String
          stringInIO x = evaluate x
        stringInIO "I was created by stringInIo" >>= f
+
+
+    it "reader monad" $ do
+      let
+        computation :: Reader MyContext (Maybe String)
+        computation = do
+          n <- asks bar
+          x <- asks foo
+          if n > 0
+            then return (Just x)
+            else return Nothing
+
+      runReader computation (MyContext "hello" 1) `shouldBe` Just "hello"
+      runReader computation (MyContext "hello" 0) `shouldBe` Nothing
+
+
+
