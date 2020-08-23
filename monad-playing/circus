@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+
+while true; do
+
+    stack clean
+    stack build
+
+    if [ $? -eq 0 ]; then
+        stack test
+    fi
+
+    echo "Waiting for some source file modification..."
+    # scan directories src/ and tests/
+    inotifywait -r -e modify -e create -e move -e delete app src test --exclude "(flycheck.*|\.\#.*)"
+done
