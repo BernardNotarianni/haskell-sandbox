@@ -3,6 +3,7 @@ module Sandbox.BoxSpec (spec) where
 import Test.Hspec
 import Control.Exception
 import Control.Monad.Reader
+import Control.Monad.Writer
 
 
 data MyContext = MyContext
@@ -62,5 +63,17 @@ spec = do
       runReader computation (MyContext "hello" 1) `shouldBe` Just "hello"
       runReader computation (MyContext "hello" 0) `shouldBe` Nothing
 
+      let
+        c1 = runReader computation (MyContext "evaluate here" 1)
+      c1 `shouldBe` Just "evaluate here"
 
+
+    it "writer monad" $ do
+      let
+        myWriter :: Writer [Int] String
+        myWriter = do
+          tell [1]
+          tell [43]
+          return "yo"
+      runWriter myWriter `shouldBe` ("yo", [1, 43])
 
